@@ -64,4 +64,14 @@ describe('Gilded Rose', () => {
       expect(items[0].quality).toBe(50);
     });
   });
+
+  describe('Sulfuras - Legendary Item', () => {
+    it('should never change quality or sellIn', () => {
+      const gildedRose = new GildedRose([new Item('Sulfuras, Hand of Ragnaros', 10, 80)]);
+      const items = gildedRose.updateQuality();
+      
+      expect(items[0].sellIn).toBe(10);
+      expect(items[0].quality).toBe(80);
+    });
+  });
 });
