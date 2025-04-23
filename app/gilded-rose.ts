@@ -28,51 +28,90 @@ export class GildedRose {
 
   updateQuality() {
     for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].name != GildedRose.AGED_BRIE && this.items[i].name != GildedRose.BACKSTAGE_PASSES) {
-        if (this.items[i].quality > GildedRose.MIN_QUALITY) {
-          if (this.items[i].name != GildedRose.SULFURAS) {
-            this.items[i].quality = this.items[i].quality - 1;
-          }
-        }
-      } else {
-        if (this.items[i].quality < GildedRose.MAX_QUALITY) {
-          this.items[i].quality = this.items[i].quality + 1;
-          if (this.items[i].name == GildedRose.BACKSTAGE_PASSES) {
-            if (this.items[i].sellIn < GildedRose.BACKSTAGE_FIRST_THRESHOLD) {
-              if (this.items[i].quality < GildedRose.MAX_QUALITY) {
-                this.items[i].quality = this.items[i].quality + 1;
-              }
-            }
-            if (this.items[i].sellIn < GildedRose.BACKSTAGE_SECOND_THRESHOLD) {
-              if (this.items[i].quality < GildedRose.MAX_QUALITY) {
-                this.items[i].quality = this.items[i].quality + 1;
-              }
-            }
-          }
-        }
+      const item = this.items[i];
+
+      if (this.isSulfuras(item)) {
+        // console.info('Sulfuras item never changes');
+        continue;
       }
-      if (this.items[i].name != GildedRose.SULFURAS) {
-        this.items[i].sellIn = this.items[i].sellIn - 1;
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != GildedRose.AGED_BRIE) {
-          if (this.items[i].name != GildedRose.BACKSTAGE_PASSES) {
-            if (this.items[i].quality > GildedRose.MIN_QUALITY) {
-              if (this.items[i].name != GildedRose.SULFURAS) {
-                this.items[i].quality = this.items[i].quality - 1;
-              }
-            }
-          } else {
-            this.items[i].quality = this.items[i].quality - this.items[i].quality; // Réinitialisation à 0
-          }
-        } else {
-          if (this.items[i].quality < GildedRose.MAX_QUALITY) {
-            this.items[i].quality = this.items[i].quality + 1;
-          }
-        }
+
+      // console.info('Updating quality for item:', item);
+      this.updateItemQuality(item);
+
+      // console.info('Decreasing sellIn for item:', item);
+      this.decreaseSellIn(item);
+
+
+      if (item.sellIn < 0) {
+        // console.info('Item has expired, updating quality again:', item);
+        this.updateExpiredItemQuality(item);
       }
     }
 
     return this.items;
+  }
+
+  private updateItemQuality(item: Item): void {
+    if (this.isAgedBrie(item)) {
+      this.increaseQuality(item);
+    } else if (this.isBackstagePass(item)) {
+      this.updateBackstagePassQuality(item);
+    } else {
+      this.decreaseQuality(item);
+    }
+  }
+
+  private updateExpiredItemQuality(item: Item): void {
+    if (this.isAgedBrie(item)) {
+      this.increaseQuality(item);
+    } else if (this.isBackstagePass(item)) {
+      this.resetQualityToZero(item);
+    } else {
+      this.decreaseQuality(item);
+    }
+  }
+
+  private updateBackstagePassQuality(item: Item): void {
+    this.increaseQuality(item);
+
+    if (item.sellIn < GildedRose.BACKSTAGE_FIRST_THRESHOLD) {
+      this.increaseQuality(item);
+    }
+
+    if (item.sellIn < GildedRose.BACKSTAGE_SECOND_THRESHOLD) {
+      this.increaseQuality(item);
+    }
+  }
+
+  private increaseQuality(item: Item): void {
+    if (item.quality < GildedRose.MAX_QUALITY) {
+      item.quality = item.quality + 1;
+    }
+  }
+
+  private decreaseQuality(item: Item): void {
+    if (item.quality > GildedRose.MIN_QUALITY) {
+      item.quality = item.quality - 1;
+    }
+  }
+
+  private decreaseSellIn(item: Item): void {
+    item.sellIn = item.sellIn - 1;
+  }
+
+  private resetQualityToZero(item: Item): void {
+    item.quality = 0;
+  }
+
+  private isAgedBrie(item: Item): boolean {
+    return item.name === GildedRose.AGED_BRIE;
+  }
+
+  private isBackstagePass(item: Item): boolean {
+    return item.name === GildedRose.BACKSTAGE_PASSES;
+  }
+
+  private isSulfuras(item: Item): boolean {
+    return item.name === GildedRose.SULFURAS;
   }
 }
