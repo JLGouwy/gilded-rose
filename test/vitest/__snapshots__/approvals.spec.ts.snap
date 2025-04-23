@@ -2,7 +2,7 @@
 
 exports[`Gilded Rose Approval > should foo 1`] = `
 [
-  Item {
+  Product {
     "name": "foo",
     "quality": 0,
     "sellIn": -1,
