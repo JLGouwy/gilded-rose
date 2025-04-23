@@ -1,0 +1,22 @@
+{
+  "name": "gilded-rose-kata",
+  "version": "1.0.0",
+  "description": "Gilded Rose kata in TypeScript",
+  "scripts": {
+    "compile": "tsc",
+    "test:vitest": "vitest --coverage"
+  },
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^18.14.0",
+    "@vitest/coverage-istanbul": "^3.1.2",
+    "source-map-support": "^0.5.20",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
+    "typescript": "^5.0.4",
+    "vite-tsconfig-paths": "^4.0.5",
+    "vitest": "^3.1.2"
+  }
+}
