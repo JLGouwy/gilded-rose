@@ -127,7 +127,8 @@ export class GildedRose {
       const product = ProductFactory.create(this.items[i].name, this.items[i].sellIn, this.items[i].quality)
       product.updateQuality();
 
-      this.items[i] = product;
+      this.items[i].sellIn = product.sellIn;
+      this.items[i].quality = product.quality;
     }
 
     return this.items;
