@@ -125,4 +125,26 @@ describe('Gilded Rose', () => {
       expect(items[0].quality).toBe(50);
     });
   });
+
+  describe('Conjured Items', () => {
+    it('should degrade conjured items twice as fast', () => {
+      // @todo
+      expect(true).toBe(false);
+    });
+  
+    it('should degrade conjured items twice as fast after expiry', () => {
+      // @todo
+      expect(true).toBe(false);
+    });
+  
+    it('should not degrade quality below 0 for conjured items', () => {
+      // @todo
+      expect(true).toBe(false);
+    });
+  
+    it('should handle conjured items with 0 quality correctly', () => {
+      // @todo
+      expect(true).toBe(false);
+    });
+  });
 });
