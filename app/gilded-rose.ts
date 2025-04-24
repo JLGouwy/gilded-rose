@@ -12,97 +12,95 @@ export class Item {
 }
 // !! do not touch Item class !!
 
-class Product extends Item {
-  constructor(name: string, sellIn: number, quality: number) {
-    super(name, sellIn, quality);
+abstract class AbstractProduct {
+  constructor(protected item: Item) {}
+
+  abstract updateQuality(): void;
+
+  getItem(): Item {
+    return this.item;
   }
 
-  updateQuality() {
-    if (this.isSulfuras()) {
-      // console.info('Sulfuras item never changes');
+  protected increaseQuality(): void {
+    if (this.item.quality < GildedRose.MAX_QUALITY) {
+      this.item.quality++;
+    }
+  }
+
+  protected decreaseQuality(): void {
+    if (this.item.quality > GildedRose.MIN_QUALITY) {
+      this.item.quality--;
+    }
+  }
+
+  protected decreaseSellIn(): void {
+    this.item.sellIn--;
+  }
+
+  protected resetQuality(): void {
+    this.item.quality = 0;
+  }
+}
+
+class AgedBrieProduct extends AbstractProduct {
+  updateQuality(): void {
+    this.decreaseSellIn();
+    this.increaseQuality();
+    if (this.item.sellIn < 0) {
+      this.increaseQuality();
+    }
+  }
+}
+
+class BackstagePassProduct extends AbstractProduct {
+  updateQuality(): void {
+    this.decreaseSellIn();
+
+    if (this.item.sellIn < 0) {
+      this.resetQuality();
       return;
     }
 
-    // console.info('Updating quality for item:', this);
-    this.updateItemQuality();
-
-    // console.info('Decreasing sellIn for item:', this);
-    this.decreaseSellIn();
-
-    if (this.sellIn < 0) {
-      // console.info('Item has expired, updating quality again:', this);
-      this.updateExpiredItemQuality();
-    }
-  }
-
-  private updateItemQuality(): void {
-    if (this.isAgedBrie()) {
-      this.increaseQuality();
-    } else if (this.isBackstagePass()) {
-      this.updateBackstagePassQuality();
-    } else {
-      this.decreaseQuality();
-    }
-  }
-
-  private updateExpiredItemQuality(): void {
-    if (this.isAgedBrie()) {
-      this.increaseQuality();
-    } else if (this.isBackstagePass()) {
-      this.resetQualityToZero();
-    } else {
-      this.decreaseQuality();
-    }
-  }
-
-  private updateBackstagePassQuality(): void {
     this.increaseQuality();
 
-    if (this.sellIn < GildedRose.BACKSTAGE_FIRST_THRESHOLD) {
+    if (this.item.sellIn < GildedRose.BACKSTAGE_FIRST_THRESHOLD) {
       this.increaseQuality();
     }
 
-    if (this.sellIn < GildedRose.BACKSTAGE_SECOND_THRESHOLD) {
+    if (this.item.sellIn < GildedRose.BACKSTAGE_SECOND_THRESHOLD) {
       this.increaseQuality();
     }
   }
+}
 
-  private increaseQuality(): void {
-    if (this.quality < GildedRose.MAX_QUALITY) {
-      this.quality = this.quality + 1;
+class SulfurasProduct extends AbstractProduct {
+  updateQuality(): void {
+    // Nothing to do
+  }
+}
+
+class GenericProduct extends AbstractProduct {
+  updateQuality(): void {
+    this.decreaseSellIn();
+    this.decreaseQuality();
+    if (this.item.sellIn < 0) {
+      this.decreaseQuality();
     }
-  }
-
-  private decreaseQuality(): void {
-    if (this.quality > GildedRose.MIN_QUALITY) {
-      this.quality = this.quality - 1;
-    }
-  }
-
-  private decreaseSellIn(): void {
-    this.sellIn = this.sellIn - 1;
-  }
-
-  private resetQualityToZero(): void {
-    this.quality = 0;
-  }
-
-  private isAgedBrie(): boolean {
-    return this.name === GildedRose.AGED_BRIE;
-  }
-
-  private isBackstagePass(): boolean {
-    return this.name === GildedRose.BACKSTAGE_PASSES;
-  }
-
-  private isSulfuras(): boolean {
-    return this.name === GildedRose.SULFURAS;
   }
 }
 
 class ProductFactory {
-  static create(name: string, sellIn: number, quality: number): Product {
-    return new Product(name, sellIn, quality);
+  static createFrom(item: Item): AbstractProduct {
+    switch (item.name) {
+      case GildedRose.AGED_BRIE:
+        return new AgedBrieProduct(item);
+      case GildedRose.BACKSTAGE_PASSES:
+        return new BackstagePassProduct(item);
+      case GildedRose.SULFURAS:
+        return new SulfurasProduct(item);
+      default:
+        return new GenericProduct(item);
+    }
   }
 }
 
@@ -118,17 +116,15 @@ export class GildedRose {
   static readonly BACKSTAGE_FIRST_THRESHOLD = 11;
   static readonly BACKSTAGE_SECOND_THRESHOLD = 6;
 
-  constructor(items = [] as Array<Item>) {
+  constructor(items: Array<Item>) {
     this.items = items;
   }
 
-  updateQuality() {
+  updateQuality(): Array<Item> {
     for (let i = 0; i < this.items.length; i++) {
-      const product = ProductFactory.create(this.items[i].name, this.items[i].sellIn, this.items[i].quality)
+      const product = ProductFactory.createFrom(this.items[i]);
       product.updateQuality();
-
-      this.items[i].sellIn = product.sellIn;
-      this.items[i].quality = product.quality;
+      this.items[i] = product.getItem();
     }
 
     return this.items;
