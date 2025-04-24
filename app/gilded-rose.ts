@@ -79,7 +79,7 @@ class SulfurasProduct extends AbstractProduct {
   }
 }
 
-class GenericProduct extends AbstractProduct {
+class StandardProduct extends AbstractProduct {
   updateQuality(): void {
     this.decreaseSellIn();
     this.decreaseQuality();
@@ -99,7 +99,7 @@ class ProductFactory {
       case GildedRose.SULFURAS:
         return new SulfurasProduct(item);
       default:
-        return new GenericProduct(item);
+        return new StandardProduct(item);
     }
   }
 }
