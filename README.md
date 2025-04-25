@@ -2,6 +2,9 @@
 
 This is the Gilded Rose kata in TypeScript.
 
+Here are the rules to follow 
+https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/main/GildedRoseRequirements.md
+
 ## Getting started
 
 Install dependencies
@@ -12,24 +15,9 @@ npm install
 
 ## Run the unit tests from the Command-Line
 
-There are two unit test frameworks to choose from, Jest and Mocha.
-
 ```sh
-npm run test:jest
+npm run test:vitest
 ```
-
-To run all tests in watch mode
-
-```sh
-npm run test:jest:watch
-```
-
-Mocha
-
-```sh
-npm run test:mocha
-```
-
 
 ## Run the TextTest fixture from the Command-Line
 
