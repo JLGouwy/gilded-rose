@@ -89,8 +89,28 @@ class StandardProduct extends AbstractProduct {
   }
 }
 
+class ConjuredProduct extends AbstractProduct {
+  updateQuality(): void {
+    this.decreaseSellIn();
+    
+    // Les items "Conjured" perdent la qualité deux fois plus vite
+    this.decreaseQuality();
+    this.decreaseQuality();
+    
+    if (this.item.sellIn < 0) {
+      // Après la date de péremption, ils perdent encore deux fois la qualité
+      this.decreaseQuality();
+      this.decreaseQuality();
+    }
+  }
+}
+
 class ProductFactory {
   static createFrom(item: Item): AbstractProduct {
+    if (/\bconjured\b/i.test(item.name.toLowerCase())) {
+      return new ConjuredProduct(item);
+    }
+
     switch (item.name) {
       case GildedRose.AGED_BRIE:
         return new AgedBrieProduct(item);
@@ -110,6 +130,7 @@ export class GildedRose {
   static readonly AGED_BRIE = 'Aged Brie';
   static readonly BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert';
   static readonly SULFURAS = 'Sulfuras, Hand of Ragnaros';
+  static readonly CONJURED = 'conjured';
 
   static readonly MAX_QUALITY = 50;
   static readonly MIN_QUALITY = 0;

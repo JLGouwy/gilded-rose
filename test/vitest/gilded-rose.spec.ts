@@ -127,24 +127,71 @@ describe('Gilded Rose', () => {
   });
 
   describe('Conjured Items', () => {
-    it('should degrade conjured items twice as fast', () => {
-      // @todo
-      expect(true).toBe(false);
+    it('should consider the item as Conjured one', () => {
+      const INITIAL_QUALITY = 20;
+      const EXPECTED_QUALITY_CONJURED = 18;
+      const EXPECTED_QUALITY_STANDARD = 19;
+      const conjuredCases = [
+        { name: 'Conjured Mana Cake'},
+        { name: 'The Conjured Staff' },
+        { name: 'Magic Conjured Potion'},
+        { name: 'CONJURED Sword'},
+        { name: 'the conjured item' },
+      ];
+
+      const standardCase = [
+        { name: 'Unconjured Item' },
+      ];
+
+      conjuredCases.forEach(testCase => {
+        const gildedRose = new GildedRose([
+          new Item(testCase.name, 10, INITIAL_QUALITY)
+        ]);
+        
+        const items = gildedRose.updateQuality();
+        
+        expect(items[0].quality).toBe(EXPECTED_QUALITY_CONJURED);
+      });
+
+      standardCase.forEach(testCase => {
+        const gildedRose = new GildedRose([
+          new Item(testCase.name, 10, INITIAL_QUALITY)
+        ]);
+        
+        const items = gildedRose.updateQuality();
+        
+        expect(items[0].quality).toBe(EXPECTED_QUALITY_STANDARD);
+      });
     });
-  
-    it('should degrade conjured items twice as fast after expiry', () => {
-      // @todo
-      expect(true).toBe(false);
+
+    it('should degrade conjured items twice as fast than standard item', () => {
+      const gildedRose = new GildedRose([new Item('Conjured Mana Cake', 10, 20)]);
+      const items = gildedRose.updateQuality();
+      
+      expect(items[0].sellIn).toBe(9);
+      expect(items[0].quality).toBe(18); // Standard items would be 19
     });
-  
+
+    it('should degrade conjured items twice as fast than standard item after expiry', () => {
+      const gildedRose = new GildedRose([new Item('Conjured Mana Cake', 0, 20)]);
+      const items = gildedRose.updateQuality();
+      
+      expect(items[0].sellIn).toBe(-1);
+      expect(items[0].quality).toBe(16); // Standard items would be 18
+    });
+
     it('should not degrade quality below 0 for conjured items', () => {
-      // @todo
-      expect(true).toBe(false);
+      const gildedRose = new GildedRose([new Item('Conjured Mana Cake', 5, 1)]);
+      const items = gildedRose.updateQuality();
+      
+      expect(items[0].quality).toBe(0);
     });
-  
+
     it('should handle conjured items with 0 quality correctly', () => {
-      // @todo
-      expect(true).toBe(false);
+      const gildedRose = new GildedRose([new Item('Conjured Mana Cake', 5, 0)]);
+      const items = gildedRose.updateQuality();
+      
+      expect(items[0].quality).toBe(0);
     });
   });
 });
